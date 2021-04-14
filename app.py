@@ -3,9 +3,11 @@ import flask
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import pandas as pd
 import secrets
+from flask_ngrok import run_with_ngrok
 
 secret = secrets.token_urlsafe(32)
 app = Flask(__name__)
+run_with_ngrok(app) 
 app.secret_key = secret
 
 
@@ -52,4 +54,4 @@ def home():
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run()
