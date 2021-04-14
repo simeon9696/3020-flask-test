@@ -1,43 +1,55 @@
 import numpy as np
 import flask
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import pandas as pd
+import secrets
 
+secret = secrets.token_urlsafe(32)
 app = Flask(__name__)
-EID = ""
+app.secret_key = secret
 
-@app.route('/')
+
+@app.route('/', methods = ['POST', 'GET'])
 def home():
-    return render_template('index.html')
+	if request.method == 'GET':
+		result = request.args.get('getEid')
+		if result == "true":
+			
+			df = pd.read_csv('reviews.csv')
+			data = df.sample()
+			eid = data['eid'].values
 
-@app.route("/summary",methods=['POST'])
-def get_summary():
-	data = pd.read_csv('summaries.csv')
-	
-	data = data[data.eid != EID]
-	
-	summary = data['pred'].values
-	return render_template('index.html', summary_text='{}'.format(summary))
+			reviews = []
+			reviews.append(data['review_0'].values[0])
+			reviews.append(data['review_1'].values[0])
+			reviews.append(data['review_2'].values[0])
+			reviews.append(data['review_3'].values[0])
+			reviews.append(data['review_4'].values[0])
+			reviews.append(data['review_5'].values[0])
+			reviews.append(data['review_6'].values[0])
+			reviews.append(data['review_7'].values[0])
 
-""" @app.route("/reviews",methods=['POST'])
-def results():
-	df = pd.read_csv('reviews.csv')
-	data = df.sample()
-	
-	EID = data['eid'].values
-	reviews = ""
-	r1 = data['review_0'].values
-	r2 = data['review_1'].values
-	r3 = data['review_2'].values
-	r4 = data['review_3'].values
-	r5 = data['review_4'].values
-	r6 = data['review_5'].values
-	r7 = data['review_6'].values
-	r8 = data['review_7'].values
-	
-	reviews = r1 + "\n" + r2 + "\n" + r3 + "\n" + r4 + "\n" + r5 + "\n" + r6 + "\n" + r7 + "\n" + r8
-	
-	return render_template('index.html', review_text='{}'.format(reviews)) """
+
+			session['eid'] = eid[0]
+			session['reviews'] = reviews
+			session['summary'] = ""
+			return render_template('index.html')
+
+	elif request.method == 'POST':
+		result = request.form.get('eid')
+		if result != "":
+			data = pd.read_csv('summaries.csv')
+			data = data[data.eid == result]
+			summary = data['pred'].values
+			session['summary'] = summary[0]
+			return render_template('index.html')
+
+
+	session['eid'] = ""
+	session['reviews'] = ""
+	session['summary'] = ""
+	return render_template("index.html")
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+	app.run(debug=True)

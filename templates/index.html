@@ -1,51 +1,49 @@
-  
 {% extends 'base.html' %}
 
 {% block head %}
-	<title>Task Master</title>
-	<meta charset="UTF-8">
-	<title>Review Summarizer Demo App</title>
+<title>Task Master</title>
+<meta charset="UTF-8">
+<title>Review Summarizer Demo App</title>
+<!-- Preserve Order of script tags-->
+<!-- Defer is necessary so the webpage is loaded before we try to reference elements on it -->
+<script defer src="{{ url_for('static', filename='index.js') }}"></script>
 
-	
+
 {% endblock %}
-
-
 {% block body %}
+
 <body style="background: #000;">
-	<h1>Review Summarizer</h1>
-	<div class="wrapper">
-		<div class="reviews">
-			<h3>Reviews</h3>
+  <h1 style="text-align: center;">Review Summarizer</h1>
 
-
-
-			<textarea name="review" rows="50" cols="50">
-		{{ review_text }} 
-	</textarea>
-
-			<button action="{{summary}}" method="post" type="submit" class="btn btn-primary btn-block btn-large">Get
-				Summary of Reviews</button>
-			<br>
-			<button action="{{reviews}}" method="post" type="submit"
-				class="btn btn-primary btn-block btn-large">Generate New Reviews</button>
-			<br>
-			<br>
-
-		</div>
-
-
-
-
-		<div class="summary">
-			<h3>Generated Summary</h3>
-			<textarea name="summaries" rows="20" cols="70">
-		{{ summary_text }}
-	</textarea>
-
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
-
+  <div>
+    <div class='row'>
+      <div class='column'>
+        <h3 style="text-align: center;">Reviews</h3>
+        <h4 style="text-align: center;">{{ session['eid'] }}</h4>
+        <ul>
+          {% for review in session['reviews'] %}
+          <li style="padding: 12px 0px;">{{review}}</li>
+          {% endfor %}
+        </ul>
+        <form action="/" method="GET">
+          <input type="text" id="eid" name="getEid" value="true" style="display: none;"><br><br>
+          <button class="btn btn-primary btn-block btn-large">
+            Generate New Reviews
+          </button>
+        </form>
+      </div>
+      <div class='column'>
+        <h3 style="text-align: center; padding-bottom: 48px;">Generated Summary</h3>
+        {{session['summary']}}
+        <form action="/" method="POST" style="padding-top: 8px;">
+          <input type="text" id="eid" name="eid" value="{{session['eid']}}" style="display: none;">
+          <button class="btn btn-primary btn-block btn-large" type="submit">
+            Get Summary of Reviews
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 
 </body>
 {% endblock %}
